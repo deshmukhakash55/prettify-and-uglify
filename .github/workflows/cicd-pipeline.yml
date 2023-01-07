@@ -5,14 +5,14 @@ on:
     branches: ["main"]
 
 jobs:
-  cache-dependencies:
+  load-dependencies:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js version 16
+      - name: Setup Node v16
         uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -32,19 +32,19 @@ jobs:
         run: npm install
 
   build-app:
-    needs: cache-dependencies
+    needs: load-dependencies
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js version 16
+      - name: Setup Node v16
         uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Cache node modules
+      - name: Load dependencies
         id: dependencies-cache
         uses: actions/cache@v3
         env:
@@ -53,7 +53,7 @@ jobs:
           path: ./node_modules/**
           key: ${{ runner.os }}-dependencies-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Cache build output
+      - name: Load build cache
         id: build-cache
         uses: actions/cache@v3
         env:
@@ -65,26 +65,26 @@ jobs:
       - name: Build
         run: npx turbo build:app
 
-      - name: Upload Artifacts
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: prettify-and-uglify-app-build
           path: build/**
 
   build-json-prettify:
-    needs: cache-dependencies
+    needs: load-dependencies
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js version 16
+      - name: Setup Node v16
         uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Cache node modules
+      - name: Load dependencies
         id: dependencies-cache
         uses: actions/cache@v3
         env:
@@ -93,7 +93,7 @@ jobs:
           path: ./node_modules/**
           key: ${{ runner.os }}-dependencies-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Cache build output
+      - name: Load build cache
         id: build-cache
         uses: actions/cache@v3
         env:
@@ -105,26 +105,26 @@ jobs:
       - name: Build
         run: npx turbo build:json-prettify
 
-      - name: Upload Artifacts
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: prettify-and-uglify-json-prettify-build
           path: build/**
 
   build-json-uglify:
-    needs: cache-dependencies
+    needs: load-dependencies
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js version 16
+      - name: Setup Node v16
         uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Cache node modules
+      - name: Load dependencies
         id: dependencies-cache
         uses: actions/cache@v3
         env:
@@ -133,7 +133,7 @@ jobs:
           path: ./node_modules/**
           key: ${{ runner.os }}-dependencies-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Cache build output
+      - name: Load build cache
         id: build-cache
         uses: actions/cache@v3
         env:
@@ -145,7 +145,7 @@ jobs:
       - name: Build
         run: npx turbo build:json-uglify
 
-      - name: Upload Artifacts
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: prettify-and-uglify-json-uglify-build
@@ -156,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Download App Artifacts

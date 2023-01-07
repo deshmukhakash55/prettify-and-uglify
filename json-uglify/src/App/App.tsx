@@ -1,5 +1,5 @@
 import React from "react";
 
 export const App = () => {
-  return <div>JSON Uglify</div>;
+  return <div>JSON uglify</div>;
 };
