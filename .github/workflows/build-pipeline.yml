@@ -32,3 +32,9 @@ jobs:
 
       - name: Build
         run: npx turbo build:app build:json-prettify build:json-uglify
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: prettify-and-uglify
+          path: build/**
