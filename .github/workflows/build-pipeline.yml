@@ -25,5 +25,10 @@ jobs:
           path: ./node_modules
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
+      - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        name: Reload the dependencies
+        continue-on-error: true
+        run: npm install
+
       - name: Build
         run: npx turbo build:app build:json-prettify build:json-uglify
