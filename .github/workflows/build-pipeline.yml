@@ -3,10 +3,6 @@ name: Build pipeline with turbo repo
 on:
   push:
     branches: ["github-action-build-pipeline"]
-  pull_request_review_comment:
-    type: "created"
-    comment:
-      body: "RUNBUILD"
 
 jobs:
   build:
