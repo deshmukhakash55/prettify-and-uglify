@@ -5,7 +5,7 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  build-app:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,15 +38,103 @@ jobs:
           cache-name: turbo-cache
         with:
           path: ./node_modules/.cache/turbo/**
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('src/**') }}
 
       - name: Build
-        run: npx turbo build:app build:json-prettify build:json-uglify
+        run: npx turbo build:app
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: prettify-and-uglify-build
+          name: prettify-and-uglify-app-build
+          path: build/**
+
+  build-json-prettify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js version 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Cache node modules
+        id: dependencies-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: node-modules
+        with:
+          path: ./node_modules/**
+          key: ${{ runner.os }}-dependencies-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+
+      - if: ${{ steps.dependencies-cache.outputs.cache-hit != 'true' }}
+        name: Reload the dependencies
+        continue-on-error: true
+        run: npm install
+
+      - name: Cache build output
+        id: build-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: turbo-cache
+        with:
+          path: ./node_modules/.cache/turbo/**
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('json-prettify/**') }}
+
+      - name: Build
+        run: npx turbo build:json-prettify
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: prettify-and-uglify-json-prettify-build
+          path: build/**
+
+  build-json-uglify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js version 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Cache node modules
+        id: dependencies-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: node-modules
+        with:
+          path: ./node_modules/**
+          key: ${{ runner.os }}-dependencies-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+
+      - if: ${{ steps.dependencies-cache.outputs.cache-hit != 'true' }}
+        name: Reload the dependencies
+        continue-on-error: true
+        run: npm install
+
+      - name: Cache build output
+        id: build-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: turbo-cache
+        with:
+          path: ./node_modules/.cache/turbo/**
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('json-uglify/**') }}
+
+      - name: Build
+        run: npx turbo build:json-uglify
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: prettify-and-uglify-json-uglify-build
           path: build/**
 
   deploy:
@@ -57,11 +145,26 @@ jobs:
       - name: Check Repository
         uses: actions/checkout@v3
 
-      - name: Download Artifacts
+      - name: Download App Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: prettify-and-uglify-build
+          name: prettify-and-uglify-app-build
           path: build
+
+      - name: Download JSON Prettify Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: prettify-and-uglify-json-prettify-build
+          path: build
+
+      - name: Download JSON Uglify Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: prettify-and-uglify-json-uglify-build
+          path: build
+
+      - name: Show build content
+        run: ls build
 
       # - name: Deploy to Netlify
       #   uses: nwtgck/actions-netlify@v2
