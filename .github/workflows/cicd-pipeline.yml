@@ -18,18 +18,27 @@ jobs:
           node-version: 16
 
       - name: Cache node modules
-        id: cache
+        id: dependencies-cache
         uses: actions/cache@v3
         env:
-          cache-name: cache-node-modules
+          cache-name: node-modules
         with:
           path: ./node_modules/**
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-dependencies-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
       - if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         name: Reload the dependencies
         continue-on-error: true
         run: npm install
+
+      - name: Cache build cache
+        id: build-cache
+        uses: actions/cache@v3
+        env:
+          cache-name: turbo-cache
+        with:
+          path: ./node_modules/.cache/turbo/**
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
 
       - name: Build
         run: npx turbo build:app build:json-prettify build:json-uglify
