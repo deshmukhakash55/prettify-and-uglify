@@ -138,7 +138,7 @@ jobs:
           path: build/**
 
   deploy:
-    needs: build
+    needs: [build-app, build-json-prettify, build-json-uglify]
     runs-on: ubuntu-latest
 
     steps:
