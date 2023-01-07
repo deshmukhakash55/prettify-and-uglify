@@ -1,0 +1,17 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build:app": {
+      "outputs": ["build/**"],
+      "inputs": ["src/**"]
+    },
+    "build:json-prettify": {
+      "outputs": ["build/**"],
+      "inputs": ["json-prettify/src/**"]
+    },
+    "build:json-uglify": {
+      "outputs": ["build/**"],
+      "inputs": ["json-uglify/src/**"]
+    }
+  }
+}
