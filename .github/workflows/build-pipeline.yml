@@ -5,7 +5,8 @@ on:
     branches: ["github-action-build-pipeline"]
   pull_request_review_comment:
     type: "created"
-    comment: { body: "RUNBUILD" }
+    comment:
+      body: "RUNBUILD"
 
 jobs:
   build:
