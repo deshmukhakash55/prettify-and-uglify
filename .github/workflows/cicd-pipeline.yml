@@ -1,4 +1,4 @@
-name: Build pipeline with turbo repo
+name: Build & Deploy pipeline with turbo repo
 
 on:
   push:
@@ -32,6 +32,23 @@ jobs:
 
       - name: Build
         run: npx turbo build:app build:json-prettify build:json-uglify
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: prettify-and-uglify-build
+          path: build/**
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: prettify-and-uglify-build
+          path: build
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.2
