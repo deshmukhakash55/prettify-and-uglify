@@ -6,5 +6,5 @@ export const App = () => {
 };
 
 const Text = styled.span`
-  color: red;
+  color: lightcoral;
 `;
