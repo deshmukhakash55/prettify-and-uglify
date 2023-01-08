@@ -57,10 +57,10 @@ jobs:
         id: build-cache
         uses: actions/cache@v3
         env:
-          cache-name: turbo-cache
+          cache-name: app
         with:
           path: ./node_modules/.cache/turbo/**
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('src/**') }}
+          key: ${{ runner.os }}-build-cache-${{ env.cache-name }}-${{ hashFiles('src/**') }}
 
       - name: Build
         run: npx turbo build:app
@@ -97,10 +97,16 @@ jobs:
         id: build-cache
         uses: actions/cache@v3
         env:
-          cache-name: turbo-cache
+          cache-name: json-prettify
         with:
           path: ./node_modules/.cache/turbo/**
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('json-prettify/**') }}
+          key: ${{ runner.os }}-build-cache-${{ env.cache-name }}-${{ hashFiles('json-prettify/**') }}
+
+      - if: ${{ steps.build-cache.outputs.cache-hit != 'true' }}
+        name: Delete old build cache
+        run: |
+          key=$(curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/deshmukhakash55/prettify-and-uglify/actions/caches | jq '.actions_caches' | jq '.[].key' | grep 'json-prettify')
+          echo ${key}
 
       - name: Build
         run: npx turbo build:json-prettify
@@ -137,10 +143,10 @@ jobs:
         id: build-cache
         uses: actions/cache@v3
         env:
-          cache-name: turbo-cache
+          cache-name: json-uglify
         with:
           path: ./node_modules/.cache/turbo/**
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('json-uglify/**') }}
+          key: ${{ runner.os }}-build-cache-${{ env.cache-name }}-${{ hashFiles('json-uglify/**') }}
 
       - name: Build
         run: npx turbo build:json-uglify
@@ -177,17 +183,17 @@ jobs:
           name: prettify-and-uglify-json-uglify-build
           path: build
 
-      - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v2
-        with:
-          publish-dir: "./build"
-          production-branch: main
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions"
-          enable-pull-request-comment: false
-          enable-commit-comment: true
-          overwrites-pull-request-comment: true
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        timeout-minutes: 1
+      # - name: Deploy to Netlify
+      #   uses: nwtgck/actions-netlify@v2
+      #   with:
+      #     publish-dir: "./build"
+      #     production-branch: main
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     deploy-message: "Deploy from GitHub Actions"
+      #     enable-pull-request-comment: false
+      #     enable-commit-comment: true
+      #     overwrites-pull-request-comment: true
+      #   env:
+      #     NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      #     NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      #   timeout-minutes: 1
